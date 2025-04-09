@@ -1,0 +1,78 @@
+version: 2
+
+project_name: templater
+
+before:
+  hooks:
+    - go mod download
+
+release:
+  prerelease: false
+
+env:
+  - CGO_ENABLED=0
+
+builds:
+  - id: linux
+    main: ./cmd/templater
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - 7
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/yousysadmin/headscale-pf/pkg.Version={{.Version }}
+
+  - id: osx
+    main: ./cmd/templater
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version }}
+
+  - id: windows
+    main: ./cmd/templater
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version }}
+
+archives:
+  - name_template: >-
+      {{ .Binary }}_v{{ .Version }}_
+      {{- .Os }}_
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.sha256"
+
+snapshot:
+  version_template: "{{ .Tag }}-devel"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

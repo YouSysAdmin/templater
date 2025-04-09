@@ -1,0 +1,5 @@
+<no value>:
+  server:
+    addr: 192.168.0.1
+    port: 8080
+    base64_password: TXlWZXJ5TG9uZ0Nvb2xQYXNzd29yZDEyMw==
